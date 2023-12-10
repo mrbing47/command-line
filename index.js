@@ -1,9 +1,4 @@
-const castTo = require("./cast");
-const Processor = require("./processor");
-const Command = require("./command");
-
 module.exports = {
-	castTo,
-	Processor,
-	Command,
+	Processor: require("./src/processor"),
+	Command: require("./src/command"),
 };

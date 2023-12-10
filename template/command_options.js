@@ -13,6 +13,11 @@ class CommandOptions {
 		alias: "t",
 		type: "bool",
 	};
+	static DATA = {
+		name: "data",
+		alias: "d",
+		type: "csv[bool|int[20,100]|float[1.1414,3.14]]",
+	};
 	static BROWSER = { name: "browser", alias: "b", type: "bool" };
 	static DEFAULT = { name: "default", alias: "d", type: "bool" };
 	static HELP = { name: "help", alias: "h", type: "bool" };

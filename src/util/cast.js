@@ -1,6 +1,6 @@
 const chalk = require("chalk");
-const _throw = require("../util/throw");
-const regex = require("../util/regex");
+const _throw = require("./throw");
+const regex = require("./regex");
 
 function getRange(range) {
 	return regex.type.extract.range

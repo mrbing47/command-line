@@ -1,7 +1,5 @@
 const chalk = require("chalk");
-const castTo = require("./cast");
-const _throw = require("../util/throw");
-const regex = require("./regex");
+const { castTo, _throw, regex } = require("./util");
 
 class Processor {
 	constructor(commands = []) {
@@ -26,7 +24,7 @@ class Processor {
 		const kwargs = [];
 		const args = [];
 
-		const number_regex = regex.value.number;
+		const number_regex = regex.value.float;
 
 		let data;
 		let command;
