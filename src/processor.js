@@ -2,7 +2,7 @@ const chalk = require("chalk");
 const { castTo, _throw, regex } = require("./util");
 
 class Processor {
-	constructor(commands = []) {
+	constructor(commands = [], fallback) {
 		if (!Array.isArray(commands)) {
 			_throw("commands must be an array in Processor.");
 		}
@@ -14,6 +14,24 @@ class Processor {
 			}),
 			{}
 		);
+
+		if (fallback) {
+			if (!(typeof fallback === "string"))
+				_throw(
+					`fallback must be of type ${chalk.yellow(
+						"string"
+					)}, received ${chalk.red(typeof fallback)}`
+				);
+
+			if (!(fallback in this.commands))
+				_throw(
+					`fallback command must exist in ${chalk.yellow(
+						"commands"
+					)} array, received ${chalk.red(fallback)}`
+				);
+		}
+
+		this.fallback = fallback;
 	}
 
 	/*
@@ -117,11 +135,16 @@ class Processor {
 	}
 
 	process(argv) {
-		const [command, data, args, kwargs] =
-			this.normaliseCommand(argv);
+		let [command, data, args, kwargs] = this.normaliseCommand(argv);
 
-		if (!(command in this.commands))
-			_throw(`Invalid command ${chalk.red(command)}`);
+		if (command) {
+			if (!(command in this.commands))
+				_throw(`Invalid command ${chalk.red(command)}`);
+		} else {
+			if (this.fallback) command = this.fallback;
+			else
+				_throw("Unable to fallback, please provide a command.");
+		}
 
 		const [normalisedArgs, normalisedKwargs] = this.normaliseFlags(
 			this.commands[command],
