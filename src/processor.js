@@ -23,7 +23,7 @@ class Processor {
 					)}, received ${chalk.red(typeof fallback)}`
 				);
 
-			if (!(fallback in this.commands))
+			if (!Object.hasOwn(this.commands, fallback))
 				_throw(
 					`fallback command must exist in ${chalk.yellow(
 						"commands"
@@ -95,7 +95,7 @@ class Processor {
 		);
 
 		for (let [index, flags] of [args, kwargs].entries()) {
-			const store = index ? return_kwarg : return_arg;
+			const store = index === 1 ? return_kwarg : return_arg;
 
 			for (let arg of flags) {
 				if (index === 0) arg = [arg, true];
@@ -138,7 +138,7 @@ class Processor {
 		let [command, data, args, kwargs] = this.normaliseCommand(argv);
 
 		if (command) {
-			if (!(command in this.commands))
+			if (!Object.hasOwn(this.commands, command))
 				_throw(`Invalid command ${chalk.red(command)}`);
 		} else {
 			if (this.fallback) command = this.fallback;
