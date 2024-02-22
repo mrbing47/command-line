@@ -7,6 +7,7 @@ module.exports = {
 		int: /^int(\[.*?,.*?\])?$/,
 		float: /^float(\[.*?,.*?\])?$/,
 		bool: /^bool$/,
+		str: /^str$/,
 		// https://stackoverflow.com/questions/32852857/javascript-conditional-regular-expression-if-then-else
 		// I have used if-else here, if | is ahead then match it or else match ]
 		csv: /^csv(\[(([a-z0-9_]+(\[[^\]]+\])?)((?=\|)\||(?!\|)\]))+)?$/,

@@ -10,7 +10,15 @@ function getRange(range) {
 }
 
 function toCSV(data) {
-	return data.split(",").filter((ele) => ele !== "");
+	return data
+		.split(",")
+		.filter((ele) => ele !== "")
+		.map((ele) => {
+			ele = ele.trim();
+			if (ele.startsWith('"') && ele.endsWith('"'))
+				ele = ele.slice(1, -1);
+			return ele;
+		});
 }
 
 function toNumber(type, regex, parser, data, min = "", max = "") {
@@ -63,7 +71,7 @@ function toFloat(data, min = "", max = "") {
 function toBool(data) {
 	const availableBool = [
 		["n", "y"],
-		["0", "1"],
+		["n", ""],
 		["false", "true"],
 	];
 
@@ -89,6 +97,11 @@ function castTo(type, data) {
 			)} type parameters.`
 		);
 
+	const valid_str_type = regex.type.str;
+	if (valid_str_type.test(type)) {
+		return data;
+	}
+
 	const valid_int_type = regex.type.int;
 	if (valid_int_type.test(type)) {
 		return toInt(data, ...getRange(type));
@@ -109,7 +122,7 @@ function castTo(type, data) {
 
 		// match all the subtypes in csv bracket.
 		const extract_subtypes = regex.type.extract.subtypes;
-		const subtypes = [...type.matchAll(extract_subtypes)].map(
+		let subtypes = [...type.matchAll(extract_subtypes)].map(
 			(e) => e[0]
 		);
 
@@ -119,10 +132,18 @@ function castTo(type, data) {
 			valid_bool_type
 		);
 
-		for (let stype of subtypes) {
-			if (!valid_sub_types.test(stype))
+		let strSubtypeIx = -1;
+		for (let [index, stype] of subtypes.entries()) {
+			if (valid_str_type.test(stype)) strSubtypeIx = index;
+			else if (!valid_sub_types.test(stype))
 				_throw(`Invalid csv subtype ${chalk.red(stype)}.`);
 		}
+
+		if (strSubtypeIx !== -1)
+			subtypes = [
+				...subtypes.toSpliced(strSubtypeIx, 1),
+				subtypes[strSubtypeIx],
+			];
 
 		const csvReturn = [];
 
@@ -133,7 +154,11 @@ function castTo(type, data) {
 					break;
 				} catch (error) {
 					if (index === subtypes.length - 1)
-						csvReturn.push(value);
+						_throw(
+							`Invalid value for subtypes [ ${chalk.yellow(
+								subtypes.join(", ")
+							)} ], received ${chalk.red(value)}`
+						);
 				}
 			}
 
@@ -143,7 +168,7 @@ function castTo(type, data) {
 	_throw(
 		"Invalid data type, can only handle " +
 			chalk.yellow(
-				"int?[min,max], bool, float?[min,max], csv?[int|float|bool]"
+				"int?[min,max], bool, float?[min,max], csv?[int|float|bool|str]"
 			) +
 			", received " +
 			chalk.red(type)
