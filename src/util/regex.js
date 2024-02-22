@@ -30,10 +30,7 @@ module.exports = {
 			const parts = /\/(.*)\/(.*)/.exec(regstr);
 			return parts.slice(1);
 		},
-		orJoin: function (regexs) {
-			if (!Array.isArray(regexs))
-				_throw("orJoin expects array as an argument.");
-
+		orJoin: function (...regexs) {
 			const modifiedRegexs = regexs.map(this.getParts);
 
 			return new RegExp(

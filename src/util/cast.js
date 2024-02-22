@@ -42,8 +42,8 @@ function toNumber(type, regex, parser, data, min = "", max = "") {
 		data = parser(data);
 		if (data >= low && data <= high) return data;
 		_throw(
-			`Integer out of ${chalk.yellow(
-				`[${min},${max}]`
+			`Required ${type} in ${chalk.yellow(
+				`[${min}, ${max}]`
 			)} range, received ${chalk.red(data)}`
 		);
 	}
@@ -113,11 +113,11 @@ function castTo(type, data) {
 			(e) => e[0]
 		);
 
-		const valid_sub_types = regex.util.orJoin([
+		const valid_sub_types = regex.util.orJoin(
 			valid_float_type,
 			valid_int_type,
-			valid_bool_type,
-		]);
+			valid_bool_type
+		);
 
 		for (let stype of subtypes) {
 			if (!valid_sub_types.test(stype))
@@ -129,7 +129,7 @@ function castTo(type, data) {
 		for (let value of csvData)
 			for (let [index, stype] of subtypes.entries()) {
 				try {
-					csvReturn.push(castTo(value, stype));
+					csvReturn.push(castTo(stype, value));
 					break;
 				} catch (error) {
 					if (index === subtypes.length - 1)
@@ -143,7 +143,7 @@ function castTo(type, data) {
 	_throw(
 		"Invalid data type, can only handle " +
 			chalk.yellow(
-				"int[min,max], bool, float[min,max], csv[int|float|bool]"
+				"int?[min,max], bool, float?[min,max], csv?[int|float|bool]"
 			) +
 			", received " +
 			chalk.red(type)
